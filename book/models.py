@@ -7,9 +7,15 @@ class Author(models.Model):
 
 
 class Book(models.Model):
-    COVER_CHOICES = ("HARD", "SOFT")
+    COVER_CHOICES = (
+        ("HARD", "Hard Cover"),
+        ("SOFT", "Soft Cover")
+    )
     title = models.CharField(max_length=255)
     author = models.ForeignKey(Author, related_name="books", on_delete=models.CASCADE)
-    cover = models.CharField(choices=COVER_CHOICES, default="HARD")
+    cover = models.CharField(max_length=4, choices=COVER_CHOICES, default="HARD")
     inventory = models.PositiveIntegerField()
     fee = models.DecimalField(max_digits=5, decimal_places=2)
+
+    class Meta:
+        ordering = ["title"]
