@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -10,9 +12,12 @@ class Borrowing(models.Model):
     user = models.ForeignKey('user.User', on_delete=models.DO_NOTHING, related_name='borrowings')
 
     def validate_borrowing(self):
-        if self.expected_return < self.borrow_date:
+        borrow_date = self.borrow_date
+        if not self.borrow_date:
+            borrow_date = datetime.date.today()
+        if self.expected_return < borrow_date:
             raise ValidationError('Expected return date should be after the borrow date.')
-        if self.actual_return and self.borrow_date < self.actual_return:
+        if self.actual_return and borrow_date > self.actual_return:
             raise ValidationError('Actual return date should be after the borrow date.')
 
     def save(
