@@ -13,7 +13,12 @@ class BorrowingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
         fields = ('id', 'expected_return', 'actual_return', 'borrow_date', 'book', 'user')
-        read_only_fields = ('id', 'user', 'actual_return', 'borrow_date')
+
+
+class BorrowingCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Borrowing
+        fields = ('id', 'expected_return', 'book')
 
     def validate(self, attrs):
         borrow_date = attrs.get('borrow_date', datetime.date.today())
@@ -30,7 +35,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             validated_data['book'].inventory -= 1
             validated_data['book'].save()
-            return super(BorrowingSerializer, self).create(validated_data)
+            return super(BorrowingCreateSerializer, self).create(validated_data)
 
 
 class BorrowingListSerializer(BorrowingSerializer):
