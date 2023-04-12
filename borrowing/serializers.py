@@ -1,5 +1,6 @@
 import datetime
 
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -21,7 +22,15 @@ class BorrowingSerializer(serializers.ModelSerializer):
         actual_return = attrs.get('actual_return', None)
         if actual_return and borrow_date > actual_return:
             raise ValidationError('Actual return date should be after the borrow date.')
+        if attrs['book'].inventory < 1:
+            raise ValidationError({'Book_inventory': 'Book inventory must be greater 0'})
         return attrs
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            validated_data['book'].inventory -= 1
+            validated_data['book'].save()
+            return super(BorrowingSerializer, self).create(validated_data)
 
 
 class BorrowingListSerializer(BorrowingSerializer):
