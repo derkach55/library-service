@@ -25,8 +25,14 @@ class BorrowingViewSet(
     def get_queryset(self):
         queryset = self.queryset
         user_id = self.request.query_params.get('user_id', None)
+        is_active = self.request.query_params.get('is_active', None)
         if user_id:
             queryset = queryset.filter(user__id=user_id)
+        if is_active == 'true':
+            queryset = queryset.filter(actual_return__isnull=True)
+        if is_active == 'false':
+            queryset = queryset.filter(actual_return__isnull=False)
+
         return queryset
 
     def perform_create(self, serializer):
