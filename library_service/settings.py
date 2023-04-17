@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'book',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_celery_beat',
     'user',
     'borrowing'
 ]
