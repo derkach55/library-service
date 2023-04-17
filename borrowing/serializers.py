@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 from book.serializers import BookSerializer
 from borrowing.models import Borrowing
 from user.serializers import UserSerializer
+from borrowing.tasks import borrowing_alert
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -35,6 +36,11 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             validated_data['book'].inventory -= 1
             validated_data['book'].save()
+            borrowing_alert.delay(
+                validated_data['user'].email,
+                validated_data['book'].title,
+                validated_data['expected_return'].strftime('%Y-%m-%d')
+            )
             return super(BorrowingCreateSerializer, self).create(validated_data)
 
 
