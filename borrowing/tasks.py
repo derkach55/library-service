@@ -24,5 +24,9 @@ def check_overdue():
             expected_return__lt=datetime.date.today()
         )
     ]
+    if not borrowings:
+        send_to_telegram('No borrowings overdue today!')
     for borrowing in borrowings:
-        send_to_telegram(f"{borrowing['user']} overdue {borrowing['book']} for {borrowing['overdue']} days")
+        send_to_telegram(f"{borrowing['user']} overdue "
+                         f"{borrowing['book']} for "
+                         f"{borrowing['overdue']} days")
