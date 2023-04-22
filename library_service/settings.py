@@ -153,3 +153,5 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 CHAT_ID = os.environ.get('CHAT_ID')
+
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
