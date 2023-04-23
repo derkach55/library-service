@@ -6,6 +6,8 @@ from rest_framework.exceptions import ValidationError
 
 from book.serializers import BookSerializer
 from borrowing.models import Borrowing
+from payment.models import Payment
+from payment.serializers import PaymentSerializer
 from payment.sessions import create_stripe_session
 from user.serializers import UserSerializer
 from borrowing.tasks import borrowing_alert
@@ -54,3 +56,8 @@ class BorrowingListSerializer(BorrowingSerializer):
 class BorrowingRetrieveSerializer(BorrowingSerializer):
     book = BookSerializer(many=False, read_only=True)
     user = UserSerializer(read_only=True)
+    payments = PaymentSerializer(many=True, source='payment_set', read_only=True)
+
+    class Meta:
+        model = Borrowing
+        fields = ('id', 'expected_return', 'actual_return', 'borrow_date', 'book', 'user', 'payments')
