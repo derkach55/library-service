@@ -32,8 +32,8 @@ def create_stripe_session(borrowing: Borrowing) -> stripe.checkout.Session:
             'quantity': 1,
         }],
         mode='payment',
-        success_url='http://localhost:8000/success',
-        cancel_url='http://localhost:8000/cancel',
+        success_url='http://127.0.0.1:8000/api/payments/success?session_id={CHECKOUT_SESSION_ID}',
+        cancel_url='http://127.0.0.1:8000/api/cancel',
     )
     create_payment(borrowing, session)
     return session
