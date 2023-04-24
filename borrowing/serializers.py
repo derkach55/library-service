@@ -6,7 +6,6 @@ from rest_framework.exceptions import ValidationError
 
 from book.serializers import BookSerializer
 from borrowing.models import Borrowing
-from payment.models import Payment
 from payment.serializers import PaymentSerializer
 from payment.sessions import create_stripe_session
 from user.serializers import UserSerializer
