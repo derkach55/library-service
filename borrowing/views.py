@@ -1,6 +1,8 @@
 import datetime
 
 from django.db import transaction
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -34,6 +36,23 @@ class BorrowingViewSet(
             return BorrowingCreateSerializer
 
         return self.serializer_class
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'user_id',
+                type=OpenApiTypes.INT,
+                description='Filter by user`s id, for admins only'),
+            OpenApiParameter(
+                'is_active',
+                type=OpenApiTypes.STR,
+                description='Filter by borrowing actual return, '
+                            '?is_active=false to get not active borrowings, '
+                            '?is_active=true for active borrowings')
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = self.queryset

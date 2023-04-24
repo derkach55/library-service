@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_celery_beat',
     'user',
-    'borrowing'
+    'borrowing',
+    'payment',
+    'drf_spectacular',
 ]
 
 SIMPLE_JWT = {
@@ -84,10 +86,18 @@ TEMPLATES = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 WSGI_APPLICATION = 'library_service.wsgi.application'
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Library API',
+    'DESCRIPTION': 'Library service',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -152,3 +162,5 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 CHAT_ID = os.environ.get('CHAT_ID')
+
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')

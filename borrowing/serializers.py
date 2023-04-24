@@ -6,6 +6,8 @@ from rest_framework.exceptions import ValidationError
 
 from book.serializers import BookSerializer
 from borrowing.models import Borrowing
+from payment.serializers import PaymentSerializer
+from payment.sessions import create_stripe_session
 from user.serializers import UserSerializer
 from borrowing.tasks import borrowing_alert
 
@@ -36,12 +38,14 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             validated_data['book'].inventory -= 1
             validated_data['book'].save()
+            borrowing = super(BorrowingCreateSerializer, self).create(validated_data)
+            create_stripe_session(borrowing)
             borrowing_alert.delay(
-                validated_data['user'].email,
-                validated_data['book'].title,
-                validated_data['expected_return'].strftime('%Y-%m-%d')
+                borrowing.user.email,
+                borrowing.book.title,
+                borrowing.expected_return.strftime('%Y-%m-%d')
             )
-            return super(BorrowingCreateSerializer, self).create(validated_data)
+            return borrowing
 
 
 class BorrowingListSerializer(BorrowingSerializer):
@@ -51,3 +55,8 @@ class BorrowingListSerializer(BorrowingSerializer):
 class BorrowingRetrieveSerializer(BorrowingSerializer):
     book = BookSerializer(many=False, read_only=True)
     user = UserSerializer(read_only=True)
+    payments = PaymentSerializer(many=True, source='payment_set', read_only=True)
+
+    class Meta:
+        model = Borrowing
+        fields = ('id', 'expected_return', 'actual_return', 'borrow_date', 'book', 'user', 'payments')

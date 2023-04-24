@@ -25,6 +25,3 @@ class Borrowing(models.Model):
     ):
         self.validate_borrowing()
         return super(Borrowing, self).save(force_insert, force_update, using, update_fields)
-
-    def __str__(self):
-        return f'{self.user.get_full_name()} {self.book}'
