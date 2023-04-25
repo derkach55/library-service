@@ -6,10 +6,10 @@ from rest_framework.exceptions import ValidationError
 
 from book.serializers import BookSerializer
 from borrowing.models import Borrowing
+from borrowing.telegram_alert import send_to_telegram
 from payment.serializers import PaymentSerializer
 from payment.sessions import create_stripe_session
 from user.serializers import UserSerializer
-from borrowing.tasks import borrowing_alert
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -40,11 +40,9 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
             validated_data['book'].save()
             borrowing = super(BorrowingCreateSerializer, self).create(validated_data)
             create_stripe_session(borrowing)
-            borrowing_alert.delay(
-                borrowing.user.email,
-                borrowing.book.title,
-                borrowing.expected_return.strftime('%Y-%m-%d')
-            )
+            message = f'{borrowing.user.email} just borrowed ' \
+                      f'{borrowing.book.title} until {borrowing.expected_return.strftime("%Y-%m-%d")}'
+            send_to_telegram(message)
             return borrowing
 
 
